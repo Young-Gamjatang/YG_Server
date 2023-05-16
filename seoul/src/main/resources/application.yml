@@ -1,0 +1,8 @@
+
+amazon:
+  aws:
+    access-key: AKIAYVTZTNGKK77V3ZUR
+    secret-key: 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
+    region: ap-northeast-2
+    dynamodb:
+      endpoint: dynamodb.ap-northeast-2.amazonaws.com
