@@ -28,10 +28,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // AWS SDK
-    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.4'
-    implementation 'software.amazon.awssdk:dynamodb:2.16.37'
-    implementation 'com.github.derjust:spring-data-dynamodb:5.1.0'
-//    implementation 'org.socialsignin.spring.data.dynamodb:spring-data-dynamodb:5.3.0'
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.563'
 
 }
 

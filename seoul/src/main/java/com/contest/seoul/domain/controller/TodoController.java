@@ -17,7 +17,8 @@ public class TodoController {
         return dBtestService.test();
     }
     @GetMapping("test/get")
-    public RestaurantItem getTest(){
-        return dBtestService.getTest();
+    public boolean getTest(){
+        System.out.println("test");
+        return dBtestService.createTable_ValidInput_TableHasBeenCreated();
     }
 }

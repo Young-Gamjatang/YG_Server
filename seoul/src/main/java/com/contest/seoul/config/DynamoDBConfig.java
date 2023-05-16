@@ -1,17 +1,16 @@
-package com.contest.seoul.test;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+package com.contest.seoul.config;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DynamoDBConfig {
@@ -37,10 +36,9 @@ public class DynamoDBConfig {
                 .withPaginationLoadingStrategy(DynamoDBMapperConfig.PaginationLoadingStrategy.EAGER_LOADING)
                 .build();
         DynamoDBMapper mapper = new DynamoDBMapper(amazonDynamoDB(), mapperConfig);
-        mapper.;
         return mapper;
     }
-
+    @Bean
     public AmazonDynamoDB amazonDynamoDB() {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonDynamoDB amazonDynamoDB =  AmazonDynamoDBClientBuilder.standard()
