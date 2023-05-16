@@ -1,28 +1,40 @@
 package com.contest.seoul.domain.controller;
 
-import com.contest.seoul.domain.model.TodoDTO;
-import com.contest.seoul.domain.repository.TodoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.contest.seoul.domain.model.RestaurantItem;
+import com.contest.seoul.domain.service.DBtestServiceByMapper;
+import com.contest.seoul.domain.service.DBtestServiceBySDK;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
+@RequiredArgsConstructor
 public class TodoController {
+    final DBtestServiceBySDK dBtestService;
+    final DBtestServiceByMapper dBtestServiceByMapper;
+    @GetMapping("test")
+    public RestaurantItem test(){
+        return dBtestService.test();
+    }
+    @GetMapping("test/get")
+    public boolean getTest(){
+        System.out.println("test");
+        return dBtestService.createTable_ValidInput_TableHasBeenCreated();
+    }
+    @PostMapping("test/put")
+    public int putTest() {
+        return dBtestService.putItem_ShouldBeCalledAfterTableCreation_StatusOk();
+    }
+    @GetMapping("test/mapper/create")
+    public boolean createTableByMapper(){
+        boolean check = dBtestServiceByMapper.createTableByMapper();
+        System.out.println(check ? "테이블 생성 성공" : "테이블 생성 실패");
 
-    @Autowired
-    private TodoRepository todoRepository;
-
-    @GetMapping("/todos")
-    public ResponseEntity<?> getAllTodos(){
-        List<TodoDTO> todos = todoRepository.findAll();
-        if(todos.size() > 0) {
-            return new ResponseEntity< List<TodoDTO>>(todos, HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>("No todos available", HttpStatus.NOT_FOUND);
-        }
+        return check;
+    }
+    @PostMapping("test/mapper/put")
+    public RestaurantItem putItemByMapper(){
+        return dBtestServiceByMapper.saveItemByMapper();
     }
 }
