@@ -1,14 +1,13 @@
 package com.contest.seoul.domain.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @DynamoDBTable(tableName = "restaurant") //해당 클래스를 엔티티로 설정합니다.
 public class RestaurantItem {
 

@@ -29,4 +29,26 @@ public class DBtestServiceByMapper {
         );
         return TableUtils.createTableIfNotExists(amazonDynamoDb, createTableRequest);
     }
+    public RestaurantItem saveItemByMapper() {
+        RestaurantItem restaurantItem = RestaurantItem.builder()
+                .latitude(143.4313)
+                .longitude(123.134)
+                .upsoSno(003013)
+                .cggCode(431)
+                .sntCobNm("밀면집")
+                .upsoNm("동래밀면")
+                .sntUptaeNm("식당")
+                .siteAddrRd("숭진리 3515번길 ")
+                .bdngJisgFlrNum(1)
+                .bdngUnderFlrNum(0)
+                .geEhYn(false)
+                .build();
+        System.out.println("생성 Item ID : "+ restaurantItem.getId());
+        dynamoDbMapper.save(restaurantItem);
+
+        RestaurantItem test = dynamoDbMapper.load(RestaurantItem.class, restaurantItem.getId());
+
+        return test;
+
+    }
 }

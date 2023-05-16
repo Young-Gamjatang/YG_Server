@@ -33,4 +33,8 @@ public class TodoController {
 
         return check;
     }
+    @PostMapping("test/mapper/put")
+    public RestaurantItem putItemByMapper(){
+        return dBtestServiceByMapper.saveItemByMapper();
+    }
 }
