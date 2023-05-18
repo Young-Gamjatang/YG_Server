@@ -1,5 +1,6 @@
 package com.contest.seoul.domain.controller;
 
+import com.contest.seoul.api.FoodSanditation;
 import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
 import com.contest.seoul.domain.service.DBtestServiceBySDK;
@@ -7,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,5 +41,10 @@ public class TodoController {
     @PostMapping("test/mapper/put")
     public RestaurantItem putItemByMapper(){
         return dBtestServiceByMapper.saveItemByMapper();
+    }
+
+    @GetMapping("test/foodApi")
+    public int testApi() throws ParserConfigurationException, IOException, SAXException {
+        return FoodSanditation.totalCount();
     }
 }
