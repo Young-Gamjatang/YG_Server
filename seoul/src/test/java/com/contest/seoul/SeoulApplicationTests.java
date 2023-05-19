@@ -8,6 +8,7 @@ class SeoulApplicationTests {
 
     @Test
     void contextLoads() {
+
     }
 
 }

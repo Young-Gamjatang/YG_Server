@@ -30,6 +30,16 @@ dependencies {
     // AWS SDK
     implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.11.563'
 
+    // JUnit5
+    testImplementation("org.junit.platform:junit-platform-launcher:1.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+
+    //GeoCoder
+    implementation 'com.google.code.geocoder-java:geocoder-java:0.16'
+
+}
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('test') {
