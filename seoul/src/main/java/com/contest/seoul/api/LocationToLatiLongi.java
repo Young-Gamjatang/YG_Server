@@ -38,8 +38,8 @@ public class LocationToLatiLongi {
             JsonObject jsResult = (JsonObject) jsrs.get("result");
             JsonObject jspoitn = (JsonObject) jsResult.get("point");
 
-            System.out.print("위도 :" +jspoitn.get("y"));
-            System.out.println("경도 : "+jspoitn.get("x"));
+//            System.out.print("위도 :" +jspoitn.get("y"));
+//            System.out.println("경도 : "+jspoitn.get("x"));
             Double[] coords = new Double[2];
             coords[0] = Double.parseDouble ((jspoitn.get("y")+"").replace("\"",""));
             coords[1] = Double.parseDouble ((jspoitn.get("x")+"").replace("\"",""));

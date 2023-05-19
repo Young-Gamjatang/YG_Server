@@ -1,5 +1,6 @@
 package com.contest.seoul.domain.controller;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.contest.seoul.api.FoodSanditation;
 import com.contest.seoul.api.LocationToLatiLongi;
 import com.contest.seoul.domain.model.RestaurantItem;
@@ -11,11 +12,13 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class TodoController {
     final DBtestServiceBySDK dBtestService;
+    final DynamoDBMapper dynamoDBMapper;
     final DBtestServiceByMapper dBtestServiceByMapper;
     @GetMapping("test")
     public RestaurantItem test(){
@@ -53,6 +56,7 @@ public class TodoController {
     }
     @GetMapping("test/getApi")
     public void testAPIAPI() throws ParserConfigurationException, IOException, SAXException {
-        FoodSanditation.getAPIList();
+        List<RestaurantItem> restaurantItems = FoodSanditation.getAPIList();
+        restaurantItems.stream().parallel().forEach(dynamoDBMapper::save);
     }
 }
