@@ -22,23 +22,18 @@ public class RestaurantItem {
     @DynamoDBIndexHashKey(globalSecondaryIndexName = "longitude") // global secondary index RangeKey 설정
     private Double longitude; // 경도
     @DynamoDBAttribute(attributeName = "upsoSno")
-    private Integer upsoSno;  // 업소일련번호
-    @DynamoDBAttribute
-    private Integer cggCode;// 시군구 코드
-    @DynamoDBAttribute
-    private String sntCobNm; // 업종명
+    private String upsoSno;  // 업소일련번호
     @DynamoDBAttribute
     private String upsoNm; // 업소명
     @DynamoDBAttribute
-    private String sntUptaeNm; // 업태명
-    @DynamoDBAttribute
     private String siteAddrRd; // 소재지도로명
     @DynamoDBAttribute
-    private Integer bdngJisgFlrNum; // 지상_부터
+    private String siteAddr; // 소재지지번명
     @DynamoDBAttribute
-    private Integer bdngUnderFlrNum; // 지하_부터
+    private String bdngJisgFlrNum; // 지상_부터
     @DynamoDBAttribute
-    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.BOOL)
-    private Boolean geEhYn; // 모범음식점여부
+    private String bdngUnderFlrNum; // 지하_부터
+    @DynamoDBAttribute
+    private String geEhYn; // 모범음식점여부
 
 }

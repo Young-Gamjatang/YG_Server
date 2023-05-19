@@ -51,4 +51,8 @@ public class TodoController {
         System.out.println(location);
         return LocationToLatiLongi.findGeoPoint(location);
     }
+    @GetMapping("test/getApi")
+    public void testAPIAPI() throws ParserConfigurationException, IOException, SAXException {
+        FoodSanditation.getAPIList();
+    }
 }

@@ -15,7 +15,7 @@ public class LocationToLatiLongi {
     public static Double[] findGeoPoint(String location) {
 
         String apikey = "4F67E194-48F1-3B5A-9744-42517407627F";
-        String searchType = "road";
+        String searchType = "parcel";
         String searchAddr = location;
         String epsg = "epsg:4326";
 
@@ -29,7 +29,6 @@ public class LocationToLatiLongi {
         sb.append("&address=" + URLEncoder.encode(searchAddr, StandardCharsets.UTF_8));
 
         try{
-            System.out.println(sb.toString());
             URL url = new URL(sb.toString());
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
 
@@ -39,7 +38,7 @@ public class LocationToLatiLongi {
             JsonObject jsResult = (JsonObject) jsrs.get("result");
             JsonObject jspoitn = (JsonObject) jsResult.get("point");
 
-            System.out.println("위도 :" +jspoitn.get("y"));
+            System.out.print("위도 :" +jspoitn.get("y"));
             System.out.println("경도 : "+jspoitn.get("x"));
             Double[] coords = new Double[2];
             coords[0] = Double.parseDouble ((jspoitn.get("y")+"").replace("\"",""));

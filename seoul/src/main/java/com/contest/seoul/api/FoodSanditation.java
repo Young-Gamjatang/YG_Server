@@ -3,6 +3,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.contest.seoul.domain.model.ErrorRestaurant;
 import com.contest.seoul.domain.model.RestaurantItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,51 +37,77 @@ public class FoodSanditation {
         int page = 1;  // 페이지 초기값
         // 총 개수 가져오기
         int totalCount = totalCount();
+        int closedCount=0;
+
+        List<RestaurantItem> itemList = new ArrayList<>();
+        List<ErrorRestaurant> errorRestaurants = new ArrayList<>();
+
         try{
-//            while(true){
-//                 parsing할 url 지정(API 키 포함해서)
-//                String url = "https://open.assembly.go.kr/portal/openapi/nubbgpxmawmzkclkc?"
-//                        +"KEY=679a42edc23e42689b7f234817f46fc6"
-//                        +"&pIndex="+page
-//                        +"&pSize="+totalCount;
-            String url = "https://open.assembly.go.kr/portal/openapi/nwvrqwxyaytdsfvhu";
-//https://open.assembly.go.kr/portal/openapi/nubbgpxmawmzkclkc?KEY=679a42edc23e42689b7f234817f46fc6&pIndex=1&pSize=50
-//                String url = "https://apis.data.go.kr/9710000/NationalAssemblyInfoService/getMemberCurrStateList?serviceKey=KoUHhFgcXAWFHvii7YKfxL2cdQMYE7j0dUoxZZXryPaJ9lz3HH463WOAopzv0XXAm66dHnxiUGjzj9Zk87ATCw%3D%3D&numOfRows=10&pageNo=1";
-            DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
-            Document doc = dBuilder.parse(url);
+            for(int i=1; i<= totalCount; i+=1000) {
+                String tempUrl = url + i + "/"+ (i+999)+"/";
+                System.out.println(tempUrl);
 
-            // root tag
-            doc.getDocumentElement().normalize();
-            System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+                DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+                DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+                Document doc = dBuilder.parse(tempUrl);
 
-            // 파싱할 tag
-            NodeList nList = doc.getElementsByTagName("row");
-            for(int temp = 0; temp < nList.getLength(); temp++){
-                Node nNode = nList.item(temp);
-                if(nNode.getNodeType() == Node.ELEMENT_NODE){
+                // root tag
+                doc.getDocumentElement().normalize();
+//                System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 
-                    Element eElement = (Element) nNode;
-                    System.out.println("######################");
-                    //System.out.println(eElement.getTextContent());
-                    System.out.println("의안ID  : " +getTagValue("HG_NM", eElement));
-//                        System.out.println("의원명  : " +getTagValue("CHM_PN", eElement));
-//                        System.out.println("재임기간 : " +getTagValue("CHM_APTM_YS", eElement));
-//                        System.out.println("몇 회차 재임  : " +getTagValue("UNIT_NM", eElement));
-                }  // for end
-            }  // if end
+                // 파싱할 tag
+                NodeList nList = doc.getElementsByTagName("row");
 
+                for(int temp = 0; temp < nList.getLength(); temp++){
+                    Node nNode = nList.item(temp);
+                    if(nNode.getNodeType() == Node.ELEMENT_NODE ){
+                        Element eElement = (Element) nNode;
+                        if(getTagValue("DCB_GBN_NM", eElement) == null) {   // 폐업 구분
+                            RestaurantItem restaurantItem = new RestaurantItem();
 
-            System.out.println("page number : "+page);
-//                if(page > 2){
-//                    break;
-//                }
-//                page += 1;
-//            }  // while end
+                            System.out.println("######################");
+                            System.out.println(restaurantItem.getUpsoNm()+"시작");
+                            restaurantItem.setUpsoSno(getTagValue("UPSO_SNO", eElement));
+                            restaurantItem.setUpsoNm(getTagValue("CGG_CODE", eElement));
+                            restaurantItem.setUpsoNm(getTagValue("UPSO_NM", eElement));
+                            restaurantItem.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
+                            restaurantItem.setSiteAddr(getTagValue("SITE_ADDR", eElement));
+                            restaurantItem.setBdngJisgFlrNum(getTagValue("BDNG_JISG_FLR_NUM", eElement));
+                            restaurantItem.setBdngUnderFlrNum(getTagValue("BDNG_UNDER_FLR_NUM", eElement));
+                            restaurantItem.setGeEhYn(getTagValue("GE_EH_YN", eElement));
+                            try{
+                                Double[] coords = LocationToLatiLongi.findGeoPoint(restaurantItem.getSiteAddr());
+                                restaurantItem.setLatitude(coords[0]);
+                                restaurantItem.setLongitude(coords[1]);
+                                itemList.add(restaurantItem);
+                            }catch (Exception e) {
+                                System.out.println("주소 변환 중 NullPointerException 발생");
+                                ErrorRestaurant errorRestaurant = new ErrorRestaurant();
+                                errorRestaurant.setName(getTagValue("UPSO_NM", eElement));
+                                errorRestaurant.setNum(itemList.size());
+                                errorRestaurants.add(errorRestaurant);
+                            }
+
+                        }else {
+                            System.out.println("폐업 구분"+getTagValue("DCB_WHY", eElement));
+                            closedCount++;
+                        }
+                        System.out.println(itemList.size());
+
+                    }  // for end
+                }  // if end
+
+            }
 
         } catch (Exception e){
             e.printStackTrace();
         }  // try~catch end
+        System.out.println("총 데이터 : "+totalCount+"개");
+        System.out.println("삽입 가능 데이터 : "+itemList.size()+"개");
+        System.out.println("에러 데이터 : "+errorRestaurants.size()+"개");
+        System.out.println("폐업 데이터 : " +closedCount+"개");
+
+
     }  // main end
     public static int totalCount() throws ParserConfigurationException, IOException, SAXException {
         int page = 1;
