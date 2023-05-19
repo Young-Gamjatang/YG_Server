@@ -44,8 +44,8 @@ public class FoodSanditation {
         List<ErrorRestaurant> errorRestaurants = new ArrayList<>();
 
         try {
-            for (int i = 1; i <= 1; i += 1) {
-                String tempUrl = url + i + "/" + (i + 10) + "/";
+            for (int i = 1; i <= totalCount; i += 1000) {
+                String tempUrl = url + i + "/" + (i + 999) + "/";
 
                 DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
