@@ -110,6 +110,7 @@ public class FoodSanditation {
         System.out.println("XXXXXXXXXXXXXXXXX");
         // 데이터 삽입
         boolean check = true;
+        System.out.println("데이터베이스 데이터 삽입 시작");
         try{
             // 병렬로하면 프로비저닝 오류 떴을 때 어디부터 다시 해야하는지 모름
             itemList.stream().forEach(dynamoDBMapper::save);
@@ -118,6 +119,7 @@ public class FoodSanditation {
             System.out.println("데이터베이스 통신 중 오류 발생"+e);
             check= false;
         }
+        System.out.println("데이터베이스 데이터 삽입 종료");
 
         return check;
     }  // main end
