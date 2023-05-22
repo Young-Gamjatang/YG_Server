@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.Projection;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
+import com.contest.seoul.domain.model.ErrorRestaurant;
 import com.contest.seoul.domain.model.RestaurantItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,17 @@ public class DBtestServiceByMapper {
     // 테이블 생성
     public boolean createTableByMapper(){
         CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(RestaurantItem.class)
+                .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
+
+        createTableRequest.getGlobalSecondaryIndexes().forEach(
+                idx -> idx
+                        .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
+                        .withProjection(new Projection().withProjectionType("ALL"))
+        );
+        return TableUtils.createTableIfNotExists(amazonDynamoDb, createTableRequest);
+    }
+    public boolean createErrorTableByMapper(){
+        CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(ErrorRestaurant.class)
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
         createTableRequest.getGlobalSecondaryIndexes().forEach(
