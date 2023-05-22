@@ -16,10 +16,13 @@ public class RestaurantItem {
     private String id;
 
     @DynamoDBAttribute  // 해당 필드를 Attribute로 설정합니다.
-    @DynamoDBIndexHashKey(globalSecondaryIndexName = "latitude") // global secondary index HashKey 설정
+    @DynamoDBIndexHashKey(globalSecondaryIndexName = "cggCode") // global secondary index HashKey 설정
+    private String cggCode;
+
+    @DynamoDBAttribute(attributeName = "latitude")
     private Double latitude; // 위도
-    @DynamoDBAttribute
-    @DynamoDBIndexHashKey(globalSecondaryIndexName = "longitude") // global secondary index RangeKey 설정
+
+    @DynamoDBAttribute(attributeName = "longitude")
     private Double longitude; // 경도
     @DynamoDBAttribute(attributeName = "upsoSno")
     private String upsoSno;  // 업소일련번호
