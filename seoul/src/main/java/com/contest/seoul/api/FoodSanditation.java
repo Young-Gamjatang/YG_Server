@@ -7,7 +7,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.contest.seoul.domain.model.ErrorRestaurant;
 import com.contest.seoul.domain.model.RestaurantItem;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,14 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
+@RequiredArgsConstructor
 public class FoodSanditation {
-
-//    static String url = "https://open.assembly.go.kr/portal/openapi/nekcaiymatialqlxr?UNIT_CD=100021&";
+    private final DynamoDBMapper dynamoDBMapper;
     static String url = "http://openapi.seoul.go.kr:8088/6c514646726a6f6e32395044784652/xml/SeoulFoodHygieneBizHealthImport/";
 
     // tag값의 정보를 가져오는 메소드
-    private static String getTagValue(String tag, Element eElement) {
+    private String getTagValue(String tag, Element eElement) {
         NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
         Node nValue = (Node) nlList.item(0);
         if(nValue == null)
@@ -34,7 +32,7 @@ public class FoodSanditation {
         return nValue.getNodeValue();
     }
 
-    public static List<RestaurantItem> getAPIList() throws ParserConfigurationException, IOException, SAXException {
+    public Boolean getAPIList() throws ParserConfigurationException, IOException, SAXException {
         int page = 1;  // 페이지 초기값
         // 총 개수 가져오기
         int totalCount = totalCount();
@@ -44,7 +42,7 @@ public class FoodSanditation {
         List<ErrorRestaurant> errorRestaurants = new ArrayList<>();
 
         try {
-            for (int i = 1; i <= totalCount; i += 1000) {
+            for (int i = 1; i <= 1; i += 1000) {
                 String tempUrl = url + i + "/" + (i + 999) + "/";
 
                 DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
@@ -79,8 +77,15 @@ public class FoodSanditation {
                                 itemList.add(restaurantItem);
                             } catch (Exception e) {
                                 ErrorRestaurant errorRestaurant = new ErrorRestaurant();
-                                errorRestaurant.setName(getTagValue("UPSO_NM", eElement));
-                                errorRestaurant.setNum(itemList.size());
+                                errorRestaurant.setUpsoSno(getTagValue("UPSO_SNO", eElement));
+                                errorRestaurant.setUpsoNm(getTagValue("CGG_CODE", eElement));
+                                errorRestaurant.setUpsoNm(getTagValue("UPSO_NM", eElement));
+                                errorRestaurant.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
+                                errorRestaurant.setSiteAddr(getTagValue("SITE_ADDR", eElement));
+                                errorRestaurant.setBdngJisgFlrNum(getTagValue("BDNG_JISG_FLR_NUM", eElement));
+                                errorRestaurant.setBdngUnderFlrNum(getTagValue("BDNG_UNDER_FLR_NUM", eElement));
+                                errorRestaurant.setGeEhYn(getTagValue("GE_EH_YN", eElement));
+                                errorRestaurant.setNum(itemList.size()+"");
                                 errorRestaurants.add(errorRestaurant);
                             }
 
@@ -98,17 +103,25 @@ public class FoodSanditation {
             e.printStackTrace();
         }  // try~catch end
         System.out.println("XXXXXXXXXXXXXXXXX");
-        System.out.println(errorRestaurants);
-
         System.out.println("총 데이터 : " + totalCount + "개");
         System.out.println("삽입 가능 데이터 : " + itemList.size() + "개");
         System.out.println("에러 데이터 : " + errorRestaurants.size() + "개");
         System.out.println("폐업 데이터 : " + closedCount + "개");
+        System.out.println("XXXXXXXXXXXXXXXXX");
+        // 데이터 삽입
+        boolean check = true;
+        try{
+            // 병렬로하면 프로비저닝 오류 떴을 때 어디부터 다시 해야하는지 모름
+            itemList.stream().forEach(dynamoDBMapper::save);
+            errorRestaurants.stream().forEach(dynamoDBMapper::save);
+        }catch(Exception e){
+            System.out.println("데이터베이스 통신 중 오류 발생"+e);
+            check= false;
+        }
 
-
-        return itemList;
+        return check;
     }  // main end
-    public static int totalCount() throws ParserConfigurationException, IOException, SAXException {
+    public int totalCount() throws ParserConfigurationException, IOException, SAXException {
         int page = 1;
         String url2 = url +page
                 +"/1";

@@ -45,10 +45,10 @@ public class TodoController {
         return dBtestServiceByMapper.saveItemByMapper();
     }
 
-    @GetMapping("test/foodApi")
-    public int testApi() throws ParserConfigurationException, IOException, SAXException {
-        return FoodSanditation.totalCount();
-    }
+//    @GetMapping("test/foodApi")
+//    public int testApi() throws ParserConfigurationException, IOException, SAXException {
+//        return FoodSanditation.totalCount();
+//    }
     @GetMapping("test/geo/{location}")
     public Double[] testGeo(@PathVariable String location) {
         System.out.println(location);
@@ -56,7 +56,6 @@ public class TodoController {
     }
     @GetMapping("test/getApi")
     public void testAPIAPI() throws ParserConfigurationException, IOException, SAXException {
-        List<RestaurantItem> restaurantItems = FoodSanditation.getAPIList();
-        restaurantItems.stream().parallel().forEach(dynamoDBMapper::save);
+
     }
 }
