@@ -63,7 +63,7 @@ public class FoodSanditation {
                         if (getTagValue("DCB_GBN_NM", eElement) == null) {   // 폐업 구분
                             RestaurantItem restaurantItem = new RestaurantItem();
                             restaurantItem.setUpsoSno(getTagValue("UPSO_SNO", eElement));
-                            restaurantItem.setUpsoNm(getTagValue("CGG_CODE", eElement));
+                            restaurantItem.setCggCode(getTagValue("CGG_CODE", eElement));
                             restaurantItem.setUpsoNm(getTagValue("UPSO_NM", eElement));
                             restaurantItem.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
                             restaurantItem.setSiteAddr(getTagValue("SITE_ADDR", eElement));
@@ -78,7 +78,7 @@ public class FoodSanditation {
                             } catch (Exception e) {
                                 ErrorRestaurant errorRestaurant = new ErrorRestaurant();
                                 errorRestaurant.setUpsoSno(getTagValue("UPSO_SNO", eElement));
-                                errorRestaurant.setUpsoNm(getTagValue("CGG_CODE", eElement));
+                                errorRestaurant.setCggCode(getTagValue("CGG_CODE", eElement));
                                 errorRestaurant.setUpsoNm(getTagValue("UPSO_NM", eElement));
                                 errorRestaurant.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
                                 errorRestaurant.setSiteAddr(getTagValue("SITE_ADDR", eElement));

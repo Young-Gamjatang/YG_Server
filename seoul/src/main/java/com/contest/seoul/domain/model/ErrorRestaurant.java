@@ -13,6 +13,9 @@ public class ErrorRestaurant {
     private String id;
 
     @DynamoDBAttribute  // 해당 필드를 Attribute로 설정합니다.
+    private String cggCode;
+
+    @DynamoDBAttribute  // 해당 필드를 Attribute로 설정합니다.
     private Double latitude; // 위도
     @DynamoDBAttribute
     private Double longitude; // 경도
