@@ -34,11 +34,7 @@ public class DBtestServiceByMapper {
         CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(ErrorRestaurant.class)
                 .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
-        createTableRequest.getGlobalSecondaryIndexes().forEach(
-                idx -> idx
-                        .withProvisionedThroughput(new ProvisionedThroughput(1L, 1L))
-                        .withProjection(new Projection().withProjectionType("ALL"))
-        );
+
         return TableUtils.createTableIfNotExists(amazonDynamoDb, createTableRequest);
     }
     public RestaurantItem saveItemByMapper() {
