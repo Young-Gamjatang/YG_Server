@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@DynamoDBTable(tableName = "restaurant") //해당 클래스를 엔티티로 설정합니다.
+@DynamoDBTable(tableName = "restaurantItem") //해당 클래스를 엔티티로 설정합니다.
 public class RestaurantItem {
 
     @DynamoDBHashKey(attributeName = "id") //해당 필드를 HashKey로 설정합니다.

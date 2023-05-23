@@ -15,25 +15,25 @@ public class ErrorRestaurant {
     @DynamoDBAttribute  // 해당 필드를 Attribute로 설정합니다.
     private String cggCode;
 
-    @DynamoDBAttribute  // 해당 필드를 Attribute로 설정합니다.
+    @DynamoDBAttribute(attributeName = "latitude")
     private Double latitude; // 위도
-    @DynamoDBAttribute
-    private Double longitude; // 경도
-    @DynamoDBAttribute(attributeName = "upsoSno")
-    private String upsoSno;  // 업소일련번호
-    @DynamoDBAttribute
-    private String upsoNm; // 업소명
-    @DynamoDBAttribute
-    private String siteAddrRd; // 소재지도로명
-    @DynamoDBAttribute
-    private String siteAddr; // 소재지지번명
-    @DynamoDBAttribute
-    private String bdngJisgFlrNum; // 지상_부터
-    @DynamoDBAttribute
-    private String bdngUnderFlrNum; // 지하_부터
-    @DynamoDBAttribute
-    private String geEhYn; // 모범음식점여부
 
+    @DynamoDBAttribute(attributeName = "longitude")
+    private Double longitude; // 경도
     @DynamoDBAttribute
-    private String num;
+    private String asgnYear; // 지정년도
+    @DynamoDBAttribute
+    private String asgnDate; // 지정일자
+    @DynamoDBAttribute
+    private String upsoName; // 업소명
+    @DynamoDBAttribute
+    private String siteAddressRd; // 소재지도로명
+    @DynamoDBAttribute
+    private String siteAddress; // 소재지지번
+    @DynamoDBAttribute
+    private String mainFood; // 주된음식
+    @DynamoDBAttribute
+    private String admdngName; // 행정동명
+    @DynamoDBAttribute
+    private String sitePhoneNumber; // 소재지전화번호
 }

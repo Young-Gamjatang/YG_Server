@@ -23,7 +23,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ModelRestaurant {
     private final DynamoDBMapper dynamoDBMapper;
-    static String url = "http://openapi.seoul.go.kr:8088/6c514646726a6f6e32395044784652/xml/SeoulFoodHygieneBizHealthImport/";
 
     // tag값의 정보를 가져오는 메소드
     private String getTagValue(String tag, Element eElement) {
@@ -38,16 +37,18 @@ public class ModelRestaurant {
         Map<String, String> guMap = ModelUrl.getMap();
         int page = 1;  // 페이지 초기값
         // 총 개수 가져오기
-        int totalCount = totalCount();
-        int closedCount = 0;
+        int totalCount = 0;
+        int successCount=0;
+        int errorCount=0;
+        boolean check = true;
 
         List<RestaurantItem> itemList = new ArrayList<>();
         List<ErrorRestaurant> errorRestaurants = new ArrayList<>();
 
-        try {
-            for (int i = 1; i <= 1; i += 1000) {
-                String tempUrl = url + i + "/" + (i + 999) + "/";
-
+        for(String guName : guMap.keySet()) {
+            try {
+                String tempUrl = guMap.get(guName);
+                System.out.println(guName+" 주소 : " +tempUrl);
                 DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
                 Document doc = dBuilder.parse(tempUrl);
@@ -63,87 +64,69 @@ public class ModelRestaurant {
                     Node nNode = nList.item(temp);
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
-                        if (getTagValue("DCB_GBN_NM", eElement) == null) {   // 폐업 구분
-                            RestaurantItem restaurantItem = new RestaurantItem();
-                            restaurantItem.setUpsoSno(getTagValue("UPSO_SNO", eElement));
-                            restaurantItem.setCggCode(getTagValue("CGG_CODE", eElement));
-                            restaurantItem.setUpsoNm(getTagValue("UPSO_NM", eElement));
-                            restaurantItem.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
-                            restaurantItem.setSiteAddr(getTagValue("SITE_ADDR", eElement));
-                            restaurantItem.setBdngJisgFlrNum(getTagValue("BDNG_JISG_FLR_NUM", eElement));
-                            restaurantItem.setBdngUnderFlrNum(getTagValue("BDNG_UNDER_FLR_NUM", eElement));
-                            restaurantItem.setGeEhYn(getTagValue("GE_EH_YN", eElement));
-                            try {
-                                Double[] coords = LocationToLatiLongi.findGeoPoint(restaurantItem.getSiteAddr());
-                                restaurantItem.setLatitude(coords[0]);
-                                restaurantItem.setLongitude(coords[1]);
-                                itemList.add(restaurantItem);
-                            } catch (Exception e) {
-                                ErrorRestaurant errorRestaurant = new ErrorRestaurant();
-                                errorRestaurant.setUpsoSno(getTagValue("UPSO_SNO", eElement));
-                                errorRestaurant.setCggCode(getTagValue("CGG_CODE", eElement));
-                                errorRestaurant.setUpsoNm(getTagValue("UPSO_NM", eElement));
-                                errorRestaurant.setSiteAddrRd(getTagValue("SITE_ADDR_RD", eElement));
-                                errorRestaurant.setSiteAddr(getTagValue("SITE_ADDR", eElement));
-                                errorRestaurant.setBdngJisgFlrNum(getTagValue("BDNG_JISG_FLR_NUM", eElement));
-                                errorRestaurant.setBdngUnderFlrNum(getTagValue("BDNG_UNDER_FLR_NUM", eElement));
-                                errorRestaurant.setGeEhYn(getTagValue("GE_EH_YN", eElement));
-                                errorRestaurant.setNum(itemList.size()+"");
-                                errorRestaurants.add(errorRestaurant);
-                            }
-
-                        } else {
-                            closedCount++;
+                        RestaurantItem restaurantItem = new RestaurantItem();
+                        restaurantItem.setCggCode(getTagValue("CGG_CODE", eElement));
+                        restaurantItem.setAsgnYear(getTagValue("ASGN_YY", eElement));
+                        restaurantItem.setAsgnDate(getTagValue("ASGN_YMD", eElement));
+                        restaurantItem.setUpsoName(getTagValue("UPSO_NM", eElement));
+                        restaurantItem.setSiteAddressRd(getTagValue("SITE_ADDR_RD", eElement));
+                        restaurantItem.setSiteAddress(getTagValue("SITE_ADDR", eElement));
+                        restaurantItem.setMainFood(getTagValue("MAIN_EDF", eElement));
+                        restaurantItem.setAdmdngName(getTagValue("ADMDNG_NM", eElement));
+                        restaurantItem.setSitePhoneNumber(getTagValue("UPSO_SITE_TELNO", eElement));
+                        try {
+                            Double[] coords = LocationToLatiLongi.findGeoPoint(restaurantItem.getSiteAddress());
+                            restaurantItem.setLatitude(coords[0]);
+                            restaurantItem.setLongitude(coords[1]);
+                            itemList.add(restaurantItem);
+                        } catch (Exception e) {
+                            ErrorRestaurant errorRestaurant = new ErrorRestaurant();
+                            errorRestaurant.setCggCode(getTagValue("CGG_CODE", eElement));
+                            errorRestaurant.setAsgnYear(getTagValue("ASGN_YY", eElement));
+                            errorRestaurant.setAsgnDate(getTagValue("ASGN_YMD", eElement));
+                            errorRestaurant.setUpsoName(getTagValue("UPSO_NM", eElement));
+                            errorRestaurant.setSiteAddressRd(getTagValue("SITE_ADDR_RD", eElement));
+                            errorRestaurant.setSiteAddress(getTagValue("SITE_ADDR", eElement));
+                            errorRestaurant.setMainFood(getTagValue("MAIN_EDF", eElement));
+                            errorRestaurant.setAdmdngName(getTagValue("ADMDNG_NM", eElement));
+                            errorRestaurant.setSitePhoneNumber(getTagValue("UPSO_SITE_TELNO", eElement));
+                            errorRestaurants.add(errorRestaurant);
                         }
-                        System.out.println("정상:" + itemList.size() + ", 주소에러:" + errorRestaurants.size() + ", 폐업:" + closedCount);
+                        totalCount++;
 
-                    }  // for end
-                }  // if end
+                    }
+                    System.out.println("정상:" + itemList.size() + ", 주소에러:" + errorRestaurants.size());
 
+                }  // for end
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }  // try~catch end
+            System.out.println(guName + " 데이터베이스 데이터 삽입 시작");
+            try{
+                // 병렬로하면 프로비저닝 오류 떴을 때 어디부터 다시 해야하는지 모름
+                successCount+= itemList.size();
+                errorCount+=errorRestaurants.size();
+                itemList.stream().parallel().forEach(dynamoDBMapper::save);
+                errorRestaurants.stream().parallel().forEach(dynamoDBMapper::save);
+            }catch(Exception e){
+                System.out.println(guName + " 데이터베이스 통신 중 오류 발생"+e);
+                check = false;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }  // try~catch end
+        }
+
         System.out.println("XXXXXXXXXXXXXXXXX");
         System.out.println("총 데이터 : " + totalCount + "개");
-        System.out.println("삽입 가능 데이터 : " + itemList.size() + "개");
-        System.out.println("에러 데이터 : " + errorRestaurants.size() + "개");
-        System.out.println("폐업 데이터 : " + closedCount + "개");
+        System.out.println("삽입 가능 데이터 : " + successCount + "개");
+        System.out.println("에러 데이터 : " + errorCount + "개");
         System.out.println("XXXXXXXXXXXXXXXXX");
         // 데이터 삽입
-        boolean check = true;
-        System.out.println("데이터베이스 데이터 삽입 시작");
-        try{
-            // 병렬로하면 프로비저닝 오류 떴을 때 어디부터 다시 해야하는지 모름
-            itemList.stream().forEach(dynamoDBMapper::save);
-            errorRestaurants.stream().forEach(dynamoDBMapper::save);
-        }catch(Exception e){
-            System.out.println("데이터베이스 통신 중 오류 발생"+e);
-            check= false;
-        }
+
         System.out.println("데이터베이스 데이터 삽입 종료");
 
         return check;
     }  // main end
-    public int totalCount() throws ParserConfigurationException, IOException, SAXException {
-        int page = 1;
-        String url2 = url +page
-                +"/1";
-        System.out.println(url2);
 
-        DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
-        Document doc = dBuilder.parse(url2);
-        // root tag
-        doc.getDocumentElement().normalize();
-
-        // 파싱할 tag
-        NodeList countList = doc.getElementsByTagName("SeoulFoodHygieneBizHealthImport");
-
-        // 총 수 출력
-        int totalCount = Integer.parseInt(getTagValue("list_total_count",(Element) ((Node)countList.item(0))));
-        System.out.println("총 데이터 수 : "+ totalCount);
-        return totalCount;
-    }
 }  // class end
