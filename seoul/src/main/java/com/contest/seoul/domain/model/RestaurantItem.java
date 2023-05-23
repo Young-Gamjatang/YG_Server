@@ -24,19 +24,21 @@ public class RestaurantItem {
 
     @DynamoDBAttribute(attributeName = "longitude")
     private Double longitude; // 경도
-    @DynamoDBAttribute(attributeName = "upsoSno")
-    private String upsoSno;  // 업소일련번호
     @DynamoDBAttribute
-    private String upsoNm; // 업소명
+    private String asgnYear; // 지정년도
     @DynamoDBAttribute
-    private String siteAddrRd; // 소재지도로명
+    private String asgnDate; // 지정일자
     @DynamoDBAttribute
-    private String siteAddr; // 소재지지번명
+    private String upsoName; // 업소명
     @DynamoDBAttribute
-    private String bdngJisgFlrNum; // 지상_부터
+    private String siteAddressRd; // 소재지도로명
     @DynamoDBAttribute
-    private String bdngUnderFlrNum; // 지하_부터
+    private String siteAddress; // 소재지지번
     @DynamoDBAttribute
-    private String geEhYn; // 모범음식점여부
+    private String mainFood; // 주된음식
+    @DynamoDBAttribute
+    private String admdngName; // 행정동명
+    @DynamoDBAttribute
+    private String sitePhoneNumber; // 소재지전화번호
 
 }
