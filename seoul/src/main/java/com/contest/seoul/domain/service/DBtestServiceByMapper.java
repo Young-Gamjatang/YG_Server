@@ -11,6 +11,8 @@ import com.contest.seoul.domain.model.RestaurantItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DBtestServiceByMapper {
@@ -56,4 +58,8 @@ public class DBtestServiceByMapper {
 //        return test;
 //
 //    }
+    public List<RestaurantItem> loadData(){
+
+        return null;
+    }
 }
