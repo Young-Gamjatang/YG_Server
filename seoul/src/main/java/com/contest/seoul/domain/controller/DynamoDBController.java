@@ -1,7 +1,7 @@
 package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.contest.seoul.api.FoodSanditation;
+import com.contest.seoul.api.ModelRestaurant;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +36,9 @@ public class DynamoDBController {
     }
     @PostMapping("insert/total")
     public boolean insertRestaurantData() throws ParserConfigurationException, IOException, SAXException {
-        FoodSanditation foodSanditation = new FoodSanditation(dynamoDBMapper);
-        foodSanditation.getAPIList();
-        return true;
+//        FoodSanditation foodSanditation = new FoodSanditation(dynamoDBMapper);
+//        foodSanditation.getAPIList();
+        ModelRestaurant modelRestaurant = new ModelRestaurant(dynamoDBMapper);
+        return modelRestaurant.getAPIList();
     }
 }

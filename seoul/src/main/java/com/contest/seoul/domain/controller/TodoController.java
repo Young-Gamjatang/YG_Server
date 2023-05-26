@@ -1,7 +1,7 @@
 package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.contest.seoul.api.FoodSanditation;
+//import com.contest.seoul.api.FoodSanditation;
 import com.contest.seoul.api.LocationToLatiLongi;
 import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
@@ -40,10 +40,11 @@ public class TodoController {
 
         return check;
     }
-    @PostMapping("test/mapper/put")
-    public RestaurantItem putItemByMapper(){
-        return dBtestServiceByMapper.saveItemByMapper();
-    }
+//    @PostMapping("test/mapper/put")
+//    public RestaurantItem putItemByMapper(){
+////        return dBtestServiceByMapper.saveItemByMapper();
+//        return null;
+//    }
 
 //    @GetMapping("test/foodApi")
 //    public int testApi() throws ParserConfigurationException, IOException, SAXException {
