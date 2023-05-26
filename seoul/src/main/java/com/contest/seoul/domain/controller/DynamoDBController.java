@@ -2,6 +2,7 @@ package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.contest.seoul.api.ModelRestaurant;
+import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,5 +41,13 @@ public class DynamoDBController {
 //        foodSanditation.getAPIList();
         ModelRestaurant modelRestaurant = new ModelRestaurant(dynamoDBMapper);
         return modelRestaurant.getAPIList();
+    }
+    @GetMapping("query")
+    public void queryTest(){
+        dBtestServiceByMapper.loadData();
+    }
+    @GetMapping("scan")
+    public void scanTest(){
+        dBtestServiceByMapper.scanData();
     }
 }

@@ -2,6 +2,7 @@ package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 //import com.contest.seoul.api.FoodSanditation;
+import com.contest.seoul.api.CggCode;
 import com.contest.seoul.api.LocationToLatiLongi;
 import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
@@ -58,5 +59,10 @@ public class TodoController {
     @GetMapping("test/getApi")
     public void testAPIAPI() throws ParserConfigurationException, IOException, SAXException {
 
+    }
+    @GetMapping("test/getCggCode")
+    public void ttt() throws ParserConfigurationException, IOException, SAXException {
+        CggCode cggCode = new CggCode();
+        cggCode.getAPIList();
     }
 }
