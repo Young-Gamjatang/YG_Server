@@ -2,21 +2,15 @@ package com.contest.seoul.domain.service;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.document.*;
-import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import com.contest.seoul.domain.model.ErrorRestaurant;
 import com.contest.seoul.domain.model.RestaurantItem;
+import com.contest.seoul.domain.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +19,7 @@ public class DBtestServiceByMapper {
 
     private final AmazonDynamoDB amazonDynamoDb;
     private final DynamoDBMapper dynamoDbMapper;
+    private final RestaurantRepository restaurantRepository;
 
     // 테이블 생성
     public boolean createTableByMapper(){
@@ -64,45 +59,65 @@ public class DBtestServiceByMapper {
 //        return test;
 //
 //    }
-    public List<RestaurantItem> loadData(){
-        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDb);
-
-        Table table = dynamoDB.getTable("restaurantItem");
-        Index index = table.getIndex("cggCode-index");
-        TableDescription tableDesc = table.describe();
-
-        QuerySpec spec = new QuerySpec()
-                .withKeyConditionExpression("cggCode = :v_code ")
-                .withValueMap(new ValueMap()
-                        .withString(":v_code","3140000"));
-
-        ItemCollection<QueryOutcome> items = index.query(spec);
-        Iterator<Item> iter = items.iterator();
-        while (iter.hasNext()) {
-            System.out.println(iter.next().toJSONPretty());
-        }
-
-        return null;
+    public List<Map<String,Object>> loadDataByCggCode(String cggCode){
+        return restaurantRepository.findByCggCode(cggCode);
     }
-    public void scanData(){
-        ScanRequest scanRequest = new ScanRequest()
-                .withTableName("restaurantItem");
-        int total = 0;
-        ScanResult result = amazonDynamoDb.scan(scanRequest);
-        List<RestaurantItem> restaurantItems = new ArrayList<>();
-        for (Map<String, AttributeValue> item : result.getItems()){
-            RestaurantItem restaurantItem = new RestaurantItem();
-            restaurantItem.setCggCode(String.valueOf(item.get("cggCode")));
-            restaurantItem.setSiteAddress(String.valueOf(item.get("siteAddress")));
-            restaurantItem.setSiteAddressRd(String.valueOf(item.get("siteAddressRd")));
-            restaurantItems.add(restaurantItem);
-            total ++;
-        }
 
-        List<RestaurantItem> sorted = restaurantItems.stream().distinct().collect(Collectors.toList());
-        System.out.println(total+","+sorted.size());
-        for(int i=0; i< sorted.size(); i++) {
-            System.out.println("시군구 코드 : "+sorted.get(i).getCggCode() +" : "+sorted.get(i).getSiteAddress()+ " : "+ sorted.get(i).getSiteAddressRd());
-        }
+    public List<RestaurantItem> scanData(){
+        return restaurantRepository.findAll();
+    }
+
+    public List<Map<String, Object>> loadNearByRestaurant(String cggCode, Double latitude, Double longitude) {
+        List<Map<String, Object>> list = restaurantRepository.findByCggCode(cggCode);
+
+        double targetLatitude = latitude; // 주어진 latitude
+        double targetLongitude = longitude; // 주어진 longitude
+
+        // 거리 계산에 사용할 Comparator
+        Comparator<Map<String, Object>> distanceComparator = (m1, m2) -> {
+            double lat1 = Double.valueOf(m1.get("latitude")+"");
+            double lon1 = Double.valueOf(m1.get("longitude")+"");
+            double lat2 = Double.valueOf(m2.get("latitude")+"");
+            double lon2 = Double.valueOf(m2.get("longitude")+"");
+
+            // 주어진 latitude와 longitude와의 거리 계산
+            double distance1 = calculateDistance(targetLatitude, targetLongitude, lat1, lon1);
+            double distance2 = calculateDistance(targetLatitude, targetLongitude, lat2, lon2);
+
+            return Double.compare(distance1, distance2);
+        };
+        // 가까운 거리에 있는 데이터 5개 추출
+        List<Map<String, Object>> nearestRestaurants = list.stream()
+                .sorted(distanceComparator)
+                .limit(5)
+                .collect(Collectors.toList());
+
+        // 추출된 데이터 출력
+//        for (Map<String, Object> restaurant : nearestRestaurants) {
+//            latitude = (double) restaurant.get("latitude");
+//            longitude = (double) restaurant.get("longitude");
+//            System.out.println("Latitude: " + latitude + ", Longitude: " + longitude);
+//        }
+        return nearestRestaurants;
+    }
+
+    private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        // 거리 계산 로직을 구현해야 함
+        // 예시: Haversine formula를 활용한 거리 계산
+
+        double earthRadius = 6371; // 지구 반지름 (단위: km)
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        double distance = earthRadius * c;
+
+        return distance;
     }
 }

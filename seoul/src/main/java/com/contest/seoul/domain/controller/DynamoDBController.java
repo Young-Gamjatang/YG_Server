@@ -1,18 +1,21 @@
 package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.contest.seoul.api.ModelRestaurant;
+import com.contest.seoul.api.ModelUrl;
 import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
+import javax.websocket.server.PathParam;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,12 +45,19 @@ public class DynamoDBController {
         ModelRestaurant modelRestaurant = new ModelRestaurant(dynamoDBMapper);
         return modelRestaurant.getAPIList();
     }
-    @GetMapping("query")
-    public void queryTest(){
-        dBtestServiceByMapper.loadData();
+    @GetMapping("query/cggcode")
+    public List<Map<String,Object>> queryTest(@RequestParam("guName") String guName){
+        return dBtestServiceByMapper.loadDataByCggCode(ModelUrl.getCggCode(guName));
+    }
+    @GetMapping("query/near")
+    public List<Map<String,Object>> queryTest(
+            @RequestParam("guName") String guName,
+            @RequestParam("latitude") Double latitude,
+            @RequestParam("longitude") Double longitude){
+        return dBtestServiceByMapper.loadNearByRestaurant(ModelUrl.getCggCode(guName),latitude,longitude);
     }
     @GetMapping("scan")
-    public void scanTest(){
-        dBtestServiceByMapper.scanData();
+    public List<RestaurantItem> scanTest(){
+        return dBtestServiceByMapper.scanData();
     }
 }
