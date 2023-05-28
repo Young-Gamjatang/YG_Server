@@ -34,7 +34,6 @@ public class RestaurantRepository {
     // 글로벌 인덱스 cggCode 조회
     public List<Map<String,Object>> findByCggCode(String cggCode){
         DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
-
         Table table = dynamoDB.getTable("restaurantItem");
         Index index = table.getIndex("cggCode-index");
 
@@ -42,6 +41,25 @@ public class RestaurantRepository {
                 .withKeyConditionExpression("cggCode = :v_code")
                 .withValueMap(new ValueMap()
                         .withString(":v_code",cggCode));
+
+        ItemCollection<QueryOutcome> items = index.query(spec);
+        Iterator<Item> iter = items.iterator();
+        List<Map<String,Object>> restaurantItem = new ArrayList<>();
+
+        while (iter.hasNext()) {
+            restaurantItem.add(iter.next().asMap());
+        }
+        return restaurantItem;
+    }
+    public List<Map<String,Object>> findByUpsoNM(String upsoNM){
+        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
+        Table table = dynamoDB.getTable("wrongrestaurant");
+        Index index = table.getIndex("upsoNm-index");
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("upsoNm = :v_upsoNm")
+                .withValueMap(new ValueMap()
+                        .withString(":v_upsoNm", upsoNM));
 
         ItemCollection<QueryOutcome> items = index.query(spec);
         Iterator<Item> iter = items.iterator();

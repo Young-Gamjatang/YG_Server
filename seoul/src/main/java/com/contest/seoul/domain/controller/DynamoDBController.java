@@ -67,4 +67,9 @@ public class DynamoDBController {
     public List<RestaurantItem> scanTest(){
         return dBtestServiceByMapper.scanData();
     }
+
+    @GetMapping("query/wrong")
+    public List<Map<String, Object>> wrongQuery(@RequestParam("upsoName") String upsoName) {
+        return dBtestServiceByMapper.findWrongRestaurantByUpsoNm(upsoName);
+    }
 }
