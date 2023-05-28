@@ -62,6 +62,12 @@ public class ModelUrl {
         districtCodeMap.put("도봉구", "3090000");
         districtCodeMap.put("광북구", "3080000");
         districtCodeMap.put("금천구", "3170000");
-        return districtCodeMap.get(gu);
+        if(districtCodeMap.containsKey(gu)) {
+            return districtCodeMap.get(gu);
+        }else {
+            System.out.println("서울이 아닙니다.");
+            return null;
+        }
+
     }
 }

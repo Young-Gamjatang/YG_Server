@@ -2,6 +2,8 @@ package com.contest.seoul.domain.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.contest.seoul.api.ModelRestaurant;
 import com.contest.seoul.api.ModelUrl;
 import com.contest.seoul.api.WrongRestaurantAPI;
@@ -54,7 +56,12 @@ public class DynamoDBController {
     }
     @GetMapping("query/cggcode")
     public List<Map<String,Object>> queryTest(@RequestParam("guName") String guName){
-        return dBtestServiceByMapper.loadDataByCggCode(ModelUrl.getCggCode(guName));
+        try {
+            return dBtestServiceByMapper.loadDataByCggCode(ModelUrl.getCggCode(guName));
+        }catch (AmazonDynamoDBException e) {
+            System.out.println("서울이 아닙니다.");
+            return null;
+        }
     }
     @GetMapping("query/near")
     public List<Map<String,Object>> queryTest(
@@ -63,12 +70,24 @@ public class DynamoDBController {
             @RequestParam("longitude") Double longitude){
         return dBtestServiceByMapper.loadNearByRestaurant(ModelUrl.getCggCode(guName),latitude,longitude);
     }
+    @GetMapping("query/wrong/cggcode")
+    public List<Map<String,Object>> queryWrongUpso(@RequestParam("guName") String guName){
+        return dBtestServiceByMapper.loadWrongDataByCggCode(ModelUrl.getCggCode(guName));
+    }
+    // 모범식당 검색
+    @GetMapping("search/restaurant")
+    public List<Map<String, Object>> searchRestaurant(@RequestParam("upsoName") String upsoName) {
+        return dBtestServiceByMapper.findModelRestaurantByUpsoNm(upsoName);
+    }
+
     @GetMapping("scan")
     public List<RestaurantItem> scanTest(){
         return dBtestServiceByMapper.scanData();
     }
 
-    @GetMapping("query/wrong")
+
+
+    @GetMapping("search/wrong")
     public List<Map<String, Object>> wrongQuery(@RequestParam("upsoName") String upsoName) {
         return dBtestServiceByMapper.findWrongRestaurantByUpsoNm(upsoName);
     }

@@ -15,10 +15,7 @@ import com.contest.seoul.domain.model.RestaurantItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -51,15 +48,15 @@ public class RestaurantRepository {
         }
         return restaurantItem;
     }
-    public List<Map<String,Object>> findByUpsoNM(String upsoNM){
+    public List<Map<String,Object>> findWrongByCggCode(String cggCode){
         DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
         Table table = dynamoDB.getTable("wrongrestaurant");
-        Index index = table.getIndex("upsoNm-index");
+        Index index = table.getIndex("cggCode");
 
         QuerySpec spec = new QuerySpec()
-                .withKeyConditionExpression("upsoNm = :v_upsoNm")
+                .withKeyConditionExpression("cggCode = :v_code")
                 .withValueMap(new ValueMap()
-                        .withString(":v_upsoNm", upsoNM));
+                        .withString(":v_code",cggCode));
 
         ItemCollection<QueryOutcome> items = index.query(spec);
         Iterator<Item> iter = items.iterator();
@@ -70,6 +67,27 @@ public class RestaurantRepository {
         }
         return restaurantItem;
     }
+    public List<Map<String, Object>> findByUpsoNM(String upsoNM) {
+        List<Map<String, AttributeValue>> items = amazonDynamoDB.scan(new ScanRequest()
+                        .withTableName("wrongrestaurant")
+                        .withFilterExpression("contains (#N, :v_name)")
+                        .withExpressionAttributeNames(Map.of("#N", "upsoNm"))
+                        .withExpressionAttributeValues(Map.of(":v_name", new AttributeValue().withS(upsoNM))))
+                .getItems();
+
+        return convertItems(items);
+    }
+    public List<Map<String, Object>> findModelByUpsoNM(String upsoNM) {
+        List<Map<String, AttributeValue>> items = amazonDynamoDB.scan(new ScanRequest()
+                        .withTableName("restaurantItem")
+                        .withFilterExpression("contains (#N, :v_name)")
+                        .withExpressionAttributeNames(Map.of("#N", "upsoName"))
+                        .withExpressionAttributeValues(Map.of(":v_name", new AttributeValue().withS(upsoNM))))
+                .getItems();
+
+        return convertItems(items);
+    }
+
     public List<RestaurantItem> findAll(){
         ScanRequest scanRequest = new ScanRequest()
                 .withTableName("restaurantItem");
@@ -93,28 +111,45 @@ public class RestaurantRepository {
 //        }
         return restaurantItems;
     }
+    private Object convertAttributeValue(AttributeValue attributeValue) {
+        if (attributeValue == null) {
+            return null;
+        }
 
-    // 조회
-    public RestaurantItem getRestaurantByLatitude(Double latitude, Double longitude) {
+        if (attributeValue.getS() != null) {
+            return attributeValue.getS();
+        }
 
-        return dynamoDBMapper.load(RestaurantItem.class, latitude, longitude);
+        if (attributeValue.getN() != null) {
+            return attributeValue.getN();
+        }
+
+        if (attributeValue.getBOOL() != null) {
+            return attributeValue.getBOOL();
+        }
+
+        // 필요한 경우 다른 타입에 대한 처리를 추가할 수 있습니다.
+
+        return null;
     }
+    public List<Map<String, Object>> convertItems(List<Map<String, AttributeValue>> items) {
+        List<Map<String, Object>> convertedItems = new ArrayList<>();
 
-    // 삭제
-    public String deleteRestaurantByLatitude(Double latitude) {
-        dynamoDBMapper.delete(dynamoDBMapper.load(RestaurantItem.class, latitude));
-        return "latitude : "+ latitude +" Deleted!";
-    }
+        for (Map<String, AttributeValue> item : items) {
+            Map<String, Object> convertedItem = new HashMap<>();
 
-    // 수정
-    public Double updateRestaurant(RestaurantItem restaurantItem) {
-        dynamoDBMapper.save(restaurantItem,
-                new DynamoDBSaveExpression()
-                        .withExpectedEntry("latutude",
-                                new ExpectedAttributeValue(
-                                        new AttributeValue().withS(restaurantItem.getLatitude().toString())
-                                )));
-        return restaurantItem.getLatitude();
+            for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
+                String key = entry.getKey();
+                AttributeValue value = entry.getValue();
+                Object convertedValue = convertAttributeValue(value);
+
+                convertedItem.put(key, convertedValue);
+            }
+
+            convertedItems.add(convertedItem);
+        }
+
+        return convertedItems;
     }
 
 }

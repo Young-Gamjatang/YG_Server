@@ -22,9 +22,7 @@ public class DBtestServiceBySDK {
     public RestaurantItem test(){
         return null;
     }
-    public RestaurantItem getTest(){
-        return restaurantRepository.getRestaurantByLatitude(123.1, 123.1);
-    }
+
     public boolean createTable_ValidInput_TableHasBeenCreated() {
         System.out.println("테이블 생성 테스트 시작");
         CreateTableRequest createTableRequest = (new CreateTableRequest())

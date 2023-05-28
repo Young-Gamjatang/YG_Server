@@ -57,9 +57,25 @@ public class DBtestServiceByMapper {
     public List<Map<String,Object>> loadDataByCggCode(String cggCode){
         return restaurantRepository.findByCggCode(cggCode);
     }
+    public List<Map<String,Object>> loadWrongDataByCggCode(String cggCode){
+        return restaurantRepository.findWrongByCggCode(cggCode);
+    }
 
     public List<RestaurantItem> scanData(){
-        return restaurantRepository.findAll();
+        List<RestaurantItem> restaurantItems = restaurantRepository.findAll();
+        countByCggCode(restaurantItems);
+        return restaurantItems;
+    }
+    public void countByCggCode(List<RestaurantItem> restaurantItems) {
+        Map<String, Long> countByCggCode = new HashMap<>();
+
+        for (RestaurantItem item : restaurantItems) {
+            String cggCode = item.getCggCode();
+            countByCggCode.put(cggCode, countByCggCode.getOrDefault(cggCode, 0L) + 1);
+        }
+        for(String key : countByCggCode.keySet()) {
+            System.out.println(key+" : "+countByCggCode.get(key));
+        }
     }
 
     public List<Map<String, Object>> loadNearByRestaurant(String cggCode, Double latitude, Double longitude) {
@@ -114,6 +130,9 @@ public class DBtestServiceByMapper {
         double distance = earthRadius * c;
 
         return distance;
+    }
+    public List<Map<String, Object>> findModelRestaurantByUpsoNm(String upsoNm) {
+        return restaurantRepository.findModelByUpsoNM(upsoNm);
     }
     public List<Map<String, Object>> findWrongRestaurantByUpsoNm(String upsoNm) {
         return restaurantRepository.findByUpsoNM(upsoNm);
