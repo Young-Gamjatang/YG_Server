@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.contest.seoul.api.ModelRestaurant;
 import com.contest.seoul.api.ModelUrl;
+import com.contest.seoul.api.WrongRestaurantAPI;
 import com.contest.seoul.domain.model.RestaurantItem;
 import com.contest.seoul.domain.service.DBtestServiceByMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +25,20 @@ public class DynamoDBController {
     private final DBtestServiceByMapper dBtestServiceByMapper;
     private final DynamoDBMapper dynamoDBMapper;
 
+    // 모범 음식점 테이블
     @PostMapping("restaurant/create")
-    public boolean createTableByMapper(){
-        boolean check = dBtestServiceByMapper.createTableByMapper();
-        System.out.println(check ? "테이블 생성 성공" : "테이블 생성 실패");
-
-        return check;
+    public String createTableByMapper(){
+        return dBtestServiceByMapper.createTableByMapper() ? "테이블 생성 성공" : "테이블 생성 실패";
     }
+    // 주소 에러 테이블
     @PostMapping("error/create")
-    public boolean createErrorTableByMapper(){
-        boolean check = dBtestServiceByMapper.createErrorTableByMapper();
-        System.out.println(check ? "테이블 생성 성공" : "테이블 생성 실패");
-
-        return check;
+    public String createErrorTableByMapper(){
+        return dBtestServiceByMapper.createErrorTableByMapper() ? "테이블 생성 성공" : "테이블 생성 실패";
+    }
+    // 위반 음식점 테이블
+    @PostMapping("wrong/create")
+    public String createWrongTableByMapper(){
+        return dBtestServiceByMapper.createWrongTableByMapper() ? "테이블 생성 성공" : "테이블 생성 실패";
     }
     @PostMapping("insert/total")
     public boolean insertRestaurantData() throws ParserConfigurationException, IOException, SAXException {
@@ -44,6 +46,11 @@ public class DynamoDBController {
 //        foodSanditation.getAPIList();
         ModelRestaurant modelRestaurant = new ModelRestaurant(dynamoDBMapper);
         return modelRestaurant.getAPIList();
+    }
+    @PostMapping("insert/wrong/total")
+    public boolean insertWrongRestaurantData() throws ParserConfigurationException, IOException, SAXException {
+        WrongRestaurantAPI wrongRestaurantAPI = new WrongRestaurantAPI(dynamoDBMapper);
+        return wrongRestaurantAPI.getAPIList();
     }
     @GetMapping("query/cggcode")
     public List<Map<String,Object>> queryTest(@RequestParam("guName") String guName){

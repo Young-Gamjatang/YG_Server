@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import com.contest.seoul.domain.model.ErrorRestaurant;
 import com.contest.seoul.domain.model.RestaurantItem;
+import com.contest.seoul.domain.model.WrongRestaurant;
 import com.contest.seoul.domain.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,18 @@ public class DBtestServiceByMapper {
 //        return test;
 //
 //    }
+// 테이블 생성
+    public boolean createWrongTableByMapper(){
+        CreateTableRequest createTableRequest = dynamoDbMapper.generateCreateTableRequest(WrongRestaurant.class)
+                .withProvisionedThroughput(new ProvisionedThroughput(10L, 10L));
+
+        createTableRequest.getGlobalSecondaryIndexes().forEach(
+                idx -> idx
+                        .withProvisionedThroughput(new ProvisionedThroughput(10L, 10L))
+                        .withProjection(new Projection().withProjectionType("ALL"))
+        );
+    return TableUtils.createTableIfNotExists(amazonDynamoDb, createTableRequest);
+}
     public List<Map<String,Object>> loadDataByCggCode(String cggCode){
         return restaurantRepository.findByCggCode(cggCode);
     }
