@@ -22,8 +22,8 @@ public class TodoController {
     final DynamoDBMapper dynamoDBMapper;
     final DBtestServiceByMapper dBtestServiceByMapper;
     @GetMapping("test")
-    public RestaurantItem test(){
-        return dBtestService.test();
+    public String test(){
+        return "hello";
     }
     @GetMapping("test/get")
     public boolean getTest(){
